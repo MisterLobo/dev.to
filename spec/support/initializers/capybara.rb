@@ -8,7 +8,7 @@ Capybara.default_max_wait_time = 10
 
 Capybara.register_driver :headless_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new(
-    args: %w[no-sandbox headless disable-gpu window-size=1920,1080 --enable-features=NetworkService,NetworkServiceInProcess],
+    args: %w[no-sandbox headless disable-gpu window-size=1920,1080 --enable-features=NetworkService,NetworkServiceInProcess allow-downloads=true],
     log_level: :error,
   )
 
@@ -18,6 +18,16 @@ end
 RSpec.configure do |config|
   config.before(:each, type: :system) do
     driven_by :rack_test
+  end
+
+  config.around(:each, raise_server_errors: false) do |example|
+    # Capybara.raise_server_errors = false
+    puts "USER COUNT BEFORE #{User.count}"
+    puts "USER RECORDS: #{User.pluck(:id, :profile_image)}"
+    example.run
+    puts "USER COUNT AFTER #{User.count}"
+    puts "USER RECORDS: #{User.pluck(:id, :profile_image)}"
+    # Capybara.raise_server_errors = true
   end
 
   config.before(:each, type: :system, js: true) do

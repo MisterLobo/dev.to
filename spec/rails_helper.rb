@@ -1,6 +1,9 @@
 ENV["RAILS_ENV"] = "test"
+require "knapsack_pro"
+KnapsackPro::Adapters::RSpecAdapter.bind
 
 require "spec_helper"
+
 require File.expand_path("../config/environment", __dir__)
 require "rspec/rails"
 abort("The Rails environment is running in production mode!") if Rails.env.production?
@@ -49,6 +52,7 @@ allowed_sites = [
   "https://github.com/mozilla/geckodriver/releases",
   "https://selenium-release.storage.googleapis.com",
   "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver",
+  "api.knapsackpro.com",
 ]
 WebMock.disable_net_connect!(allow_localhost: true, allow: allowed_sites)
 
@@ -61,6 +65,25 @@ Rack::Attack.enabled = false
 # explicitly configure field tests to exclude bots
 # see https://github.com/fnando/browser/blob/master/CHANGELOG.md#300
 Browser::Bot.matchers.delete(Browser::Bot::EmptyUserAgentMatcher)
+
+module Warden
+  module Test
+    module Helpers
+      def logout(*scopes)
+        Warden::Manager.on_request do |proxy|
+          proxy.logout(*scopes)
+        end
+      end
+
+      def login_as(user, opts = {})
+        Warden::Manager.on_request do |proxy|
+          opts[:event] || :authentication
+          proxy.set_user(user, opts)
+        end
+      end
+    end
+  end
+end
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
@@ -166,6 +189,19 @@ RSpec.configure do |config|
     # Prevent Percy.snapshot from trying to hit the agent while not in use
 
     allow(Percy).to receive(:snapshot)
+  end
+
+  config.after do
+    Timecop.return
+  end
+
+  config.after(:suite) do
+    WebMock.disable_net_connect!(
+      allow_localhost: true,
+      allow: [
+        "api.knapsackpro.com",
+      ],
+    )
   end
 
   OmniAuth.config.test_mode = true
