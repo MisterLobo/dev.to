@@ -16,11 +16,16 @@ RSpec.describe "User visits articles by tag", type: :system do
 
       it "shows the header", js: true, percy: true, raise_server_errors: false do
         Percy.snapshot(page, name: "Tags: logged out user")
-
+        puts "Image1: #{article.user.profile_image_90}"
+        puts "Image2: #{article2.user.profile_image_90}"
+        puts "Image3: #{article3.user.profile_image_90}"
         within("h1") { expect(page).to have_text("javascript") }
       end
 
       it "shows the follow button", js: true, raise_server_errors: false do
+        puts "Image1: #{article.user.profile_image_90}"
+        puts "Image2: #{article2.user.profile_image_90}"
+        puts "Image3: #{article3.user.profile_image_90}"
         within("h1") { expect(page).to have_button("Follow") }
       end
 
@@ -45,6 +50,9 @@ RSpec.describe "User visits articles by tag", type: :system do
       end
 
       it "when user clicks 'week'", js: true, raise_server_errors: false do
+        puts "Image1: #{article.user.profile_image_90}"
+        puts "Image2: #{article2.user.profile_image_90}"
+        puts "Image3: #{article3.user.profile_image_90}"
         click_on "WEEK"
 
         within("#articles-list") do

@@ -66,25 +66,6 @@ Rack::Attack.enabled = false
 # see https://github.com/fnando/browser/blob/master/CHANGELOG.md#300
 Browser::Bot.matchers.delete(Browser::Bot::EmptyUserAgentMatcher)
 
-module Warden
-  module Test
-    module Helpers
-      def logout(*scopes)
-        Warden::Manager.on_request do |proxy|
-          proxy.logout(*scopes)
-        end
-      end
-
-      def login_as(user, opts = {})
-        Warden::Manager.on_request do |proxy|
-          opts[:event] || :authentication
-          proxy.set_user(user, opts)
-        end
-      end
-    end
-  end
-end
-
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.fixture_path = "#{::Rails.root}/spec/fixtures"

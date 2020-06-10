@@ -22,11 +22,7 @@ RSpec.configure do |config|
 
   config.around(:each, raise_server_errors: false) do |example|
     # Capybara.raise_server_errors = false
-    puts "USER COUNT BEFORE #{User.count}"
-    puts "USER RECORDS: #{User.pluck(:id, :profile_image)}"
     example.run
-    puts "USER COUNT AFTER #{User.count}"
-    puts "USER RECORDS: #{User.pluck(:id, :profile_image)}"
     # Capybara.raise_server_errors = true
   end
 
